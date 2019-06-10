@@ -244,8 +244,6 @@ class DeviceFinder {
     using std::placeholders::_1;
     using std::placeholders::_2;
     for (size_t i = 0; i < targets_.size(); ++i) {
-      // TODO(mrry): Propagate a timeout here, since `this->WhenFound()` may
-      // never be called.
       NewRemoteDevices(env_->env, worker_cache_, targets_[i],
                        std::bind(&ME::WhenFound, this, i, _1, _2));
     }
@@ -258,8 +256,6 @@ class DeviceFinder {
 
   Status Wait() {
     mutex_lock l(mu_);
-    // TODO(mrry): Propagate a timeout here, since `num_pending_` may
-    // never become zero.
     while (num_pending_ != 0) {
       pending_zero_.wait_for(l, std::chrono::milliseconds(kLoggingPeriodMs));
       if (num_pending_ != 0) {
@@ -370,7 +366,6 @@ void Master::CreateSession(const CreateSessionRequest* req,
     // client-supplied ClusterDef (ClusterSpec propagation).
     std::unique_ptr<WorkerCacheInterface> worker_cache_ptr;
     std::unique_ptr<DeviceSet> device_set;
-    // TODO(saeta): Convert to std::make_unique when available.
     std::unique_ptr<std::vector<std::unique_ptr<Device>>> remote_devices(
         new std::vector<std::unique_ptr<Device>>());
 
@@ -401,7 +396,6 @@ void Master::CreateSession(const CreateSessionRequest* req,
             }
             if (env_->local_devices[0]->parsed_name().job == job.name() &&
                 env_->local_devices[0]->parsed_name().task == task.first) {
-              // TODO(b/37868888): Remove this limitation when resolved
               status = errors::InvalidArgument(
                   "The ClusterSpec names the job and task index to be the same "
                   "names that were provided when the server booted. This is "

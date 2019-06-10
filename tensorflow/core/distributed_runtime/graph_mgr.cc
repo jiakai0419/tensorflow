@@ -533,8 +533,6 @@ void GraphMgr::StartParallelExecutors(
   //  args.runner = [pool](std::function<void()> fn) { pool->Schedule(fn); };
   auto default_runner = std::bind(&thread::ThreadPool::Schedule, pool, _1);
   for (const auto& unit : item->units) {
-    // TODO(zhengxq): if the device picks its own threadpool, we need to assign
-    //     less threads to the main compute pool by default.
     thread::ThreadPool* device_thread_pool =
         unit.device->tensorflow_device_thread_pool();
     if (!device_thread_pool) {

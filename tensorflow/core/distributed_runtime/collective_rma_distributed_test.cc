@@ -188,7 +188,6 @@ class CollRMADistTest : public ::testing::Test {
       string name = strings::StrCat("/job:worker/replica:0/task:", w);
       if (w == 0) {
         dev0_worker_name = name;
-        // TODO(tucker): Change to use config when available.
         // config.set_collective_group_leader(name);
       }
       DefineWorker(config, name, device_type, num_devices);

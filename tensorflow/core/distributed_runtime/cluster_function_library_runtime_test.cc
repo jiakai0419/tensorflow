@@ -301,10 +301,6 @@ node {
   TF_EXPECT_GRAPH_EQ(expected, actual);
 }
 
-// Disabling the following two tests since there seem to be some issues with
-// GRPC bringing up multiple processes as sub-processes.
-// More info at: https://github.com/grpc/grpc/issues/10142.
-// TODO(rohanj): Enable tests when the grpc bug is fixed.
 TEST_F(ClusterFunctionLibraryRuntimeTest, DISABLED_InstantiateAndRun) {
   FunctionDefLibrary proto;
   *(proto.add_function()) = test::function::XTimesTwoInt32();

@@ -126,7 +126,6 @@ class EagerServiceImpl {
         int64 operation_id) {
       mutex_lock l(tensors_mu_);
       for (int i = 0; i < handles.size(); i++) {
-        // TODO(nareshmodi): Correctly handle operation_id not being unique.
         tensors_.emplace(RemoteTensorHandleInternal(operation_id, i),
                          handles[i]);
       }

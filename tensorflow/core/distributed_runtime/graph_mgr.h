@@ -117,8 +117,6 @@ class GraphMgr {
   };
 
   struct Item : public core::RefCounted {
-    // TODO(zhifengc): Keeps a copy of the original graph if the need arises.
-    // TODO(zhifengc): Stats, updated by multiple runs potentially.
     // TODO(zhifengc): Dup-detection. Ensure step_id only run once.
     ~Item() override;
 
@@ -156,10 +154,6 @@ class GraphMgr {
   bool sync_on_finish_ = true;
 
   // Table mapping graph handles to registered graphs.
-  //
-  // TODO(zhifengc): If the client does not call Deregister, we'll
-  // lose memory over time. We should implement a timeout-based
-  // mechanism to gc these graphs.
   std::unordered_map<string, Item*> table_;
 
   void StartParallelExecutors(const string& handle, int64 step_id, Item* item,

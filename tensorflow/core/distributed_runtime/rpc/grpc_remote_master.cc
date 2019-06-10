@@ -144,15 +144,12 @@ class GrpcRemoteMaster : public MasterInterface {
         // an RPC just before the deadline is exceeded, we will still set the
         // timeout to the original value. This leads to the overall timeout
         // being double what was expected.
-        // TODO(b/117162170): investigate fixing this behavior for legacy and
-        // gRPC RPC layers.
         ctx.set_deadline(gpr_time_from_millis(timeout_in_ms, GPR_TIMESPAN));
       }
       s = FromGrpcStatus((stub_.get()->*pfunc)(&ctx, *request, response));
       if (!errors::IsUnavailable(s)) {
         return s;
       }
-      // TODO(b/117162170): we may want to make this configurable.
       constexpr int kMaxRetries = 10;
       LOG(WARNING) << "RPC failed with status = \"" << s
                    << "\" and grpc_error_string = \""

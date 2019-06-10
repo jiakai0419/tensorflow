@@ -46,10 +46,6 @@ class WorkerCacheWrapper : public WorkerCacheInterface {
   }
 
   // Release a worker previously returned by this->GetOrCreateWorker(target).
-  //
-  // TODO(jeff,sanjay): Consider moving target into WorkerInterface.
-  // TODO(jeff,sanjay): Unify all worker-cache impls and factor out a
-  //                    per-rpc-subsystem WorkerInterface creator.
   virtual void ReleaseWorker(const string& target, WorkerInterface* worker) {
     return wrapped_->ReleaseWorker(target, worker);
   }

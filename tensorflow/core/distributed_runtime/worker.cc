@@ -254,7 +254,6 @@ void Worker::DoRunGraph(CallOptions* opts, RunGraphRequestWrapper* request,
       });
 }
 
-// TODO(suharshs): Add stats collection support to partial run.
 void Worker::DoPartialRunGraph(CallOptions* opts,
                                RunGraphRequestWrapper* request,
                                MutableRunGraphResponseWrapper* response,

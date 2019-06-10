@@ -371,8 +371,6 @@ void SetDevice(GraphDef* graph, const string& name, const string& dev) {
   LOG(FATAL) << "Name '" << name << "' not found.";
 }
 
-// TODO(b/32636929): This test fails 1/1000 times. Disable it while we
-// figure out why.
 TEST(GrpcSessionTest, DISABLED_MultiDevices) {
   std::unique_ptr<test::TestCluster> cluster;
   TF_CHECK_OK(test::TestCluster::MakeTestCluster(Devices(1, 0), 2, &cluster));
@@ -1092,8 +1090,7 @@ TEST(SessionTest, RunTimeoutWithSessionOptions) {
   // Verifies that Run() times out, and the error code is DEADLINE_EXCEEDED.
   std::vector<std::pair<string, Tensor>> inputs;
   Status status = session->Run(inputs, {}, {b_delay->name()}, nullptr);
-  // TODO(sherrym): Due to potentially a GRPC bug, we sometimes get
-  // GRPC_CHTTP2_INTERNAL_ERROR which is mapped to error::INTERNAL.
+
   EXPECT_TRUE(error::DEADLINE_EXCEEDED == status.code() ||
               error::INTERNAL == status.code());
 }
@@ -1119,8 +1116,7 @@ TEST(SessionTest, RunTimeoutWithRunOptions) {
   run_options.set_timeout_in_ms(100);
   Status status = session->Run(run_options, inputs, {}, {b_delay->name()},
                                nullptr, nullptr);
-  // TODO(sherrym): Due to potentially a GRPC bug, we sometimes get
-  // GRPC_CHTTP2_INTERNAL_ERROR which is mapped to error::INTERNAL.
+
   EXPECT_TRUE(error::DEADLINE_EXCEEDED == status.code() ||
               error::INTERNAL == status.code());
 }

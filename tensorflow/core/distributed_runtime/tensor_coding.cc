@@ -199,9 +199,6 @@ bool TensorResponse::ParseTensorSubmessage(
         Tensor t(allocator_, tensor_meta->dtype(), shape);
         StringPiece buf = t.tensor_data();
         if (static_cast<size_t>(num_bytes) != buf.size()) return false;
-        // TODO(jeff,sanjay): Figure out a way to avoid this copy if
-        // the underlying ZeroCopyInputStream data is properly aligned
-        // and compatible with what allocator_ wants.
         if (!input->ReadRaw(const_cast<char*>(buf.data()), num_bytes))
           return false;
         tensor_ = std::move(t);

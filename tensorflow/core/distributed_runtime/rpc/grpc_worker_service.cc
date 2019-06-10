@@ -129,9 +129,6 @@ class GrpcWorkerServiceThread {
   // Add one or more completion queue entries for each worker method, then
   // begin servicing requests from the completion queue.
   void HandleRPCsLoop() {
-    // TODO(ncteisen): This may require performance engineering. We can
-    // change the number of threads, the number of handlers per thread,
-    // or even decide to specialize certain threads to certain methods.
     SETUP_FOR_REQUEST(GetStatus, 1, false);
     SETUP_FOR_REQUEST(CreateWorkerSession, 1, false);
     SETUP_FOR_REQUEST(DeleteWorkerSession, 1, false);
@@ -148,8 +145,6 @@ class GrpcWorkerServiceThread {
     SETUP_FOR_REQUEST(CleanupGraph, 100, false);
     SETUP_FOR_REQUEST(MarkRecvFinished, 10, false);
 
-    // TODO(ncteisen): Determine a better policy for enqueuing the
-    // appropriate number of each request type.
     for (int i = 0;
          i < gtl::FindWithDefault(
                  queue_depth_, static_cast<int>(GrpcWorkerMethod::kRecvTensor),
@@ -370,8 +365,6 @@ class GrpcWorkerService : public AsyncServiceInterface {
                     GrpcWorkerServiceOptions options)
       : is_shutdown_(false) {
     builder->RegisterService(&worker_service_);
-    // TODO(jingdong): it would be cleaner to move this option to GrpcWorker
-    // since the cache is maintained by GrpcWorker now.
     if (options.cache_rpc_response) {
       worker->EnableResponseCache();
     }
@@ -564,10 +557,6 @@ namespace {
 // some otherwise unnecessary copies, but it improves runtime overall by
 // improving flow control.  Best performance is likely achieved with a
 // max_chunk_bytes equal to the memory page size.
-//
-// TODO(tucker): When proto3 supports [ctype=CORD] then change
-// RecvBufRespExtra.tensor_content to a cord instead of a repeated string,
-// and remove this function.
 void SetTensorInRecvBufResp(int64 max_chunk_bytes, const Tensor* tensor,
                             RecvBufResponse* response) {
   RecvBufRespExtra extra;

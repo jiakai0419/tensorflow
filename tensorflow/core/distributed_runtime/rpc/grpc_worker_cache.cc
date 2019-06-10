@@ -33,7 +33,6 @@ namespace {
 
 class GrpcWorkerCache : public WorkerCachePartial {
  public:
-  // TODO(ncteisen): consider adding a config var or flag for this
   static constexpr const size_t kGrpcWorkerCacheThreadCount = 8;
 
   explicit GrpcWorkerCache(std::shared_ptr<GrpcChannelCache> channel_cache,

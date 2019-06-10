@@ -61,8 +61,6 @@ namespace tensorflow {
 // MasterSession wraps ClientGraph in a reference counted object.
 // This way, MasterSession can clear up the cache mapping Run requests to
 // compiled graphs while the compiled graph is still being used.
-//
-// TODO(zhifengc): Cleanup this class. It's becoming messy.
 class MasterSession::ReffedClientGraph : public core::RefCounted {
  public:
   ReffedClientGraph(const string& handle, const BuildGraphOptions& bopts,
@@ -144,7 +142,6 @@ class MasterSession::ReffedClientGraph : public core::RefCounted {
         // ReffedClientGraph owns p.worker so we need to hold a ref to
         // ensure that the method doesn't attempt to access p.worker after
         // ReffedClient graph has deleted it.
-        // TODO(suharshs): Simplify this ownership model.
         Unref();
       });
     }
@@ -424,8 +421,6 @@ Status MasterSession::ReffedClientGraph::DoBuildPartitions(
   if (popts.need_to_record_start_times) {
     CostModel cost_model(true);
     cost_model.InitFromGraph(client_graph->graph);
-    // TODO(yuanbyu): Use the real cost model.
-    // execution_state_->MergeFromGlobal(&cost_model);
     SlackAnalysis sa(&client_graph->graph, &cost_model);
     sa.ComputeAsap(&popts.start_times);
   }
@@ -579,8 +574,6 @@ Status AddSendFromClientRequest(const RunCallableRequest& client_req,
   return worker_req->AddSendFromRunCallableRequest(client_req, index, send_key);
 }
 
-// TODO(mrry): Add a full-fledged wrapper that avoids TensorProto copies for
-// in-process messages.
 struct RunCallableResponseWrapper {
   RunCallableResponse* resp;  // Not owned.
   std::unordered_map<string, TensorProto> fetch_key_to_protos;
@@ -590,9 +583,6 @@ struct RunCallableResponseWrapper {
   Status AddTensorFromRunGraphResponse(
       const string& tensor_name, MutableRunGraphResponseWrapper* worker_resp,
       size_t index) {
-    // TODO(b/74355905): Add a specialized implementation that avoids
-    // copying the tensor into the RunCallableResponse when at least
-    // two of the {client, master, worker} are in the same process.
     return worker_resp->RecvValue(index, &fetch_key_to_protos[tensor_name]);
   }
 };
@@ -815,9 +805,6 @@ Status MasterSession::ReffedClientGraph::RunPartitions(
       call_opts, req, &wrapped_resp, cm, false /* is_last_partial_run */));
 
   // Collects fetches.
-  // TODO(b/74355905): Add a specialized implementation that avoids
-  // copying the tensor into the RunCallableResponse when at least
-  // two of the {client, master, worker} are in the same process.
   for (const string& fetch : callable_opts_.fetch()) {
     TensorProto* fetch_proto = resp->mutable_fetch()->Add();
     auto iter = wrapped_resp.fetch_key_to_protos.find(fetch);
@@ -963,8 +950,6 @@ void MasterSession::ReffedClientGraph::ProcessDeviceStats(
       if (!found_node_in_graph && ns.timeline_label().empty()) {
         // The counter incrementing is not thread-safe. But we don't really
         // care.
-        // TODO(zhengxq): we should implement a LOG_FIRST_N and LOG_EVERY_N for
-        // more general usage.
         static int log_counter = 0;
         if (log_counter < 10) {
           log_counter++;
@@ -1138,7 +1123,6 @@ void BuildBuildGraphOptions(const PartialRunSetupRequest& req,
       req.target_size(), [&req](size_t i) { return req.target(i); },
       callable_opts->mutable_target());
 
-  // TODO(cais): Add TFDBG support to partial runs.
 }
 
 uint64 HashBuildGraphOptions(const BuildGraphOptions& opts) {
@@ -1228,7 +1212,6 @@ Status MasterSession::Create(GraphDef* graph_def,
         "Distributed session does not support session thread pool options.");
   }
   if (session_opts_.config.graph_options().place_pruned_graph()) {
-    // TODO(b/29900832): Fix this or remove the option.
     LOG(WARNING) << "Distributed session does not support the "
                     "place_pruned_graph option.";
     session_opts_.config.mutable_graph_options()->set_place_pruned_graph(false);
@@ -1799,10 +1782,6 @@ Status MasterSession::CreateDebuggerState(
     target_names.push_back(req.target_name(i));
   }
 
-  // TODO(cais): We currently use -1 as a dummy value for session run count.
-  // While this counter value is straightforward to define and obtain for
-  // DirectSessions, it is less so for non-direct Sessions. Devise a better
-  // way to get its value when the need arises.
   TF_RETURN_IF_ERROR(debugger_state->get()->PublishDebugMetadata(
       debug_options.global_step(), rcg_execution_count, rcg_execution_count,
       input_names, output_names, target_names));

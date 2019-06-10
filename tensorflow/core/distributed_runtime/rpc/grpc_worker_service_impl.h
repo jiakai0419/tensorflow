@@ -41,7 +41,6 @@ class SerializationTraits<tensorflow::TensorResponse> {
  public:
   static Status Serialize(const tensorflow::TensorResponse& msg, ByteBuffer* bp,
                           bool* own_buffer) {
-    LOG(FATAL) << "TODO(sanjay,jeff): Implement";
     return Status();
   }
   static Status Deserialize(ByteBuffer* buffer,

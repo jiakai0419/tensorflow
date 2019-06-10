@@ -186,10 +186,6 @@ Status GrpcServer::Init(const GrpcServerOptions& opts) {
   // configured. However, this is not dangerous, because we do not
   // start serving requests until `this->Start()` is called, which
   // happens after this method returns.
-  //
-  // TODO(mrry): Provide a general mechanism for dynamically setting
-  // the identities of tasks in the worker pool after the service is
-  // running.
   ::grpc::ServerBuilder builder;
   builder.AddListeningPort(strings::StrCat("0.0.0.0:", requested_port),
                            GetServerCredentials(server_def_), &bound_port_);

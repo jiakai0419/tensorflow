@@ -57,7 +57,6 @@ Status ValidateHostPortPair(const string& host_port) {
 }  // namespace
 
 ::grpc::ChannelArguments GetChannelArguments(const RPCOptions* rpc_options) {
-  // TODO(mrry): Implement secure channels.
   ::grpc::ChannelArguments args;
   args.SetInt(GRPC_ARG_MAX_MESSAGE_LENGTH, std::numeric_limits<int32>::max());
   // NOTE(mrry): Some versions of gRPC use a 20-second minimum backoff
@@ -167,7 +166,6 @@ class CachingGrpcChannelCache : public GrpcChannelCache {
   virtual SharedGrpcChannelPtr FindChannelOnce(const string& target) = 0;
 
  private:
-  // TODO(zhifengc): Eviction when the map becomes too big.
   mutex mu_;
   std::unordered_map<string, SharedGrpcChannelPtr> channels_ GUARDED_BY(mu_);
 };

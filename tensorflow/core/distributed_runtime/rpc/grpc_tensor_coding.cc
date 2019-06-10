@@ -146,8 +146,6 @@ void EncodeTensorToByteBuffer(bool is_dead, const Tensor& val, bool require_ack,
   response.set_send_start_micros(Env::Default()->NowMicros());
   if (!DataTypeCanUseMemcpy(val.dtype())) {
     // Straightforward but slow path for complicated kinds of tensor data
-    // TODO(jeff,sanjay): If this becomes an issue, we could
-    // go directly from val -> ByteBuffer, with some effort.
     val.AsProtoTensorContent(response.mutable_tensor());
 
     // Encode full protocol buffer to a ByteBuffer

@@ -33,8 +33,6 @@ limitations under the License.
 #include "tensorflow/core/util/command_line_flags.h"
 
 // This binary starts a TensorFlow server (master and worker).
-//
-// TODO(mrry): Replace with a py_binary that uses `tf.GrpcServer()`.
 namespace tensorflow {
 namespace {
 

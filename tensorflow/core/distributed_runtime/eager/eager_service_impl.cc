@@ -149,7 +149,6 @@ Status EagerServiceImpl::CreateContext(const CreateContextRequest* request,
 Status TensorHandleShape(TensorHandle* handle, TensorShapeProto* proto) {
   const tensorflow::Tensor* t = nullptr;
 
-  // TODO(nareshmodi): This call makes async calls sync calls. Fix this.
   TF_RETURN_IF_ERROR(handle->Tensor(&t));
 
   t->shape().AsProto(proto);
@@ -192,7 +191,6 @@ Status EagerServiceImpl::ExecuteOp(const Operation& operation,
   }
 
   int num_retvals = 0;
-  // TODO(nareshmodi): Consider caching this.
   TF_RETURN_IF_ERROR(GetNumRetvals(server_context->Context(), operation.name(),
                                    operation.attrs(), &num_retvals));
 
